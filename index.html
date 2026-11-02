@@ -256,6 +256,464 @@
         map.on("layerremove", function(){
             resetLabels([layer_module1_3]);
         });
-        </script>        
+        </script>  
+<!-- Box09：淺藍色照片展覽版面 -->
+<style>
+:root {
+  --box09-bg: #edf7fc;
+  --box09-card: #f4fbff;
+  --box09-blue: #acd8f0;
+  --box09-border: #c5e5f6;
+  --box09-ink: #214c6a;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body.box09-page {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, #ffffff 0%, transparent 50%),
+    linear-gradient(135deg, #edf8ff, #dceef8);
+  color: var(--box09-ink);
+  font-family: -apple-system, BlinkMacSystemFont,
+    "PingFang TC", "Microsoft JhengHei", sans-serif;
+}
+
+/* 標題區 */
+#box09-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 122px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 24px;
+  text-align: center;
+}
+
+#box09-header h1 {
+  margin: 0;
+  color: white;
+  font-family: "Songti TC", "STSong", "SimSun", serif;
+  font-size: clamp(23px, 3vw, 40px);
+  font-weight: 700;
+  letter-spacing: 2px;
+  line-height: 1.45;
+  -webkit-text-stroke: 1px #72aed0;
+  paint-order: stroke fill;
+  text-shadow: 0 3px 8px rgba(70, 127, 164, 0.18);
+}
+
+#box09-header p {
+  margin: 8px 0 0;
+  color: #456d88;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+/* 左側資訊卡 */
+#box09-panel {
+  position: fixed;
+  top: 138px;
+  bottom: 26px;
+  left: 26px;
+  width: 34%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 24px;
+  background: rgba(244, 251, 255, 0.97);
+  border: 3px solid white;
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(61, 116, 150, 0.12);
+}
+
+#box09-panel h2 {
+  margin: 0 0 16px;
+  font-family: "Songti TC", "STSong", "SimSun", serif;
+  font-size: 23px;
+  color: #285d7d;
+}
+
+.box09-hint {
+  margin: 0;
+  padding: 24px 18px;
+  line-height: 1.9;
+  text-align: center;
+  background: #e6f4fc;
+  border: 1px dashed #8dbfdc;
+  border-radius: 14px;
+}
+
+#box09-details {
+  font-size: 14px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+#box09-details img {
+  display: block;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 440px !important;
+  margin: 0 auto 20px;
+  border: 5px solid white;
+  border-radius: 10px;
+  box-sizing: border-box;
+  box-shadow: 0 5px 16px rgba(47, 96, 129, 0.12);
+}
+
+#box09-details table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#box09-details th,
+#box09-details td {
+  padding: 10px 5px;
+  border-bottom: 1px solid #d5e9f5;
+  text-align: left;
+  vertical-align: top;
+}
+
+#box09-details th {
+  color: #315f7b;
+}
+
+#box09-details a {
+  color: #22638d;
+}
+
+/* 右側窗框地圖 */
+body.box09-page #map {
+  position: fixed !important;
+  top: 138px !important;
+  right: 26px !important;
+  bottom: 26px !important;
+  left: calc(34% + 48px) !important;
+  width: auto !important;
+  height: auto !important;
+  box-sizing: border-box;
+  border: 8px solid white;
+  border-radius: 24px;
+  overflow: hidden;
+  outline: 2px solid #b9dff2;
+  box-shadow: 0 12px 35px rgba(61, 116, 150, 0.16);
+}
+
+/* 地圖彈窗 */
+.leaflet-popup-content-wrapper {
+  background: #e2f2fc;
+  color: #214c6a;
+  border: 2px solid white;
+  border-radius: 14px;
+  box-shadow: 0 6px 22px rgba(46, 99, 133, 0.18);
+}
+
+.leaflet-popup-tip {
+  background: #e2f2fc;
+}
+
+.leaflet-popup-content {
+  color: #214c6a;
+  font-size: 13px;
+  line-height: 1.65;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+/* 大照片在左側展示，地圖彈窗不重複顯示 */
+.leaflet-popup-content img {
+  display: none !important;
+}
+
+.leaflet-popup-content table {
+  border-collapse: collapse;
+}
+
+.leaflet-popup-content th,
+.leaflet-popup-content td {
+  padding: 4px;
+}
+
+/* 圓形聚合標記 */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background: rgba(166, 216, 244, 0.45);
+}
+
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  box-sizing: border-box;
+  background: #acd8f0;
+  color: #214c6a;
+  border: 2px solid white;
+  font-weight: 600;
+}
+
+/* 若原本是一般圖示標記，使用淺藍圓點 */
+.box09-marker {
+  box-sizing: border-box;
+  background: #9bd2ef;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 7px rgba(36, 91, 126, 0.28);
+}
+
+.box09-note {
+  margin: 20px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #50758e;
+}
+
+/* 手機：上方地圖、下方照片 */
+@media (max-width: 760px) {
+  body.box09-page {
+    overflow-y: auto;
+  }
+
+  #box09-header {
+    position: relative;
+    height: auto;
+    min-height: 112px;
+    padding: 22px 16px;
+  }
+
+  #box09-header h1 {
+    font-size: 24px;
+    letter-spacing: 1px;
+  }
+
+  #box09-header p {
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  body.box09-page #map {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    width: calc(100% - 32px) !important;
+    height: 44vh !important;
+    min-height: 280px;
+    margin: 4px 16px 20px;
+    border-width: 6px;
+  }
+
+  #box09-panel {
+    position: relative;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    width: calc(100% - 32px);
+    margin: 0 16px 24px;
+    padding: 20px;
+    overflow: visible;
+  }
+}
+</style>
+
+<header id="box09-header">
+  <h1>Box09照片整理——馬灣涌漁村舊探</h1>
+  <p>歷史影像 · 漁村日常 · 地景記憶</p>
+</header>
+
+<aside id="box09-panel" aria-label="照片資訊">
+  <h2>照片與故事</h2>
+
+  <div id="box09-details" aria-live="polite">
+    <p class="box09-hint">
+      點選右側地圖上的淺藍色標記，<br>
+      在這裏查看照片與相關資料。
+    </p>
+  </div>
+
+  <p class="box09-note">
+    部分標記為大概位置，請配合個別照片的定位說明閱讀。
+  </p>
+</aside>
+
+<script>
+(function () {
+  function setupBox09() {
+    if (
+      typeof L === "undefined" ||
+      typeof map === "undefined" ||
+      !(map instanceof L.Map)
+    ) {
+      console.warn("Box09：找不到 Leaflet map，未套用新版面。");
+      return;
+    }
+
+    document.body.classList.add("box09-page");
+    document.title = "Box09照片整理——馬灣涌漁村舊探";
+
+    var mapElement = map.getContainer();
+    var panel = document.getElementById("box09-panel");
+    var details = document.getElementById("box09-details");
+
+    /* 手機上讓地圖排在資訊卡前面 */
+    mapElement.insertAdjacentElement("afterend", panel);
+
+    var fieldLabels = {
+      "Photo ID": "照片編號",
+      "Date": "拍攝日期",
+      "Place": "地點",
+      "Subject": "主題",
+      "Photographer": "攝影者",
+      "Photo Source": "照片來源",
+      "Description": "照片描述",
+      "Location Precision": "定位細緻度",
+      "Location Source": "定位依據",
+      "Uncertainty": "定位不確定性",
+      "Latitude": "緯度",
+      "Longitude": "經度"
+    };
+
+    var hiddenFields = [
+      "photo path",
+      "photo_path",
+      "latitude",
+      "longitude"
+    ];
+
+    function copyPopupToPanel(popup) {
+      var popupElement = popup.getElement();
+      if (!popupElement) return;
+
+      var original = popupElement.querySelector(
+        ".leaflet-popup-content"
+      );
+      if (!original) return;
+
+      var copy = original.cloneNode(true);
+
+      /* 移除複製內容的 id，避免同頁重複 */
+      copy.removeAttribute("id");
+      copy.querySelectorAll("[id]").forEach(function (node) {
+        node.removeAttribute("id");
+      });
+
+      /* 把現有已修好的圖片移到資訊卡頂部 */
+      var images = Array.from(copy.querySelectorAll("img"));
+      var imageArea = document.createElement("div");
+
+      images.forEach(function (image) {
+        image.removeAttribute("width");
+        image.removeAttribute("height");
+        image.loading = "lazy";
+        image.alt = image.alt || "馬灣涌歷史照片";
+        imageArea.appendChild(image);
+      });
+
+      copy.querySelectorAll("tr").forEach(function (row) {
+        var heading = row.querySelector("th");
+        if (!heading) return;
+
+        var name = heading.textContent.trim();
+        var normalized = name.replace(/:$/, "").trim();
+
+        if (
+          hiddenFields.indexOf(normalized.toLowerCase()) !== -1
+        ) {
+          row.remove();
+          return;
+        }
+
+        if (fieldLabels[normalized]) {
+          heading.textContent = fieldLabels[normalized];
+        }
+      });
+
+      details.replaceChildren();
+
+      if (images.length) {
+        details.appendChild(imageArea);
+      }
+
+      while (copy.firstChild) {
+        details.appendChild(copy.firstChild);
+      }
+
+      panel.scrollTop = 0;
+    }
+
+    /* 等其他原有彈窗處理完成後，再複製內容 */
+    map.on("popupopen", function (event) {
+      window.requestAnimationFrame(function () {
+        copyPopupToPanel(event.popup);
+      });
+    });
+
+    /* 統一照片點外觀，不改動座標或圖片資料 */
+    var visited = new WeakSet();
+
+    function stylePhotoLayer(layer) {
+      if (!layer || visited.has(layer)) return;
+      visited.add(layer);
+
+      var geometry = layer.feature && layer.feature.geometry;
+      var isPoint = geometry &&
+        (geometry.type === "Point" ||
+         geometry.type === "MultiPoint");
+
+      if (isPoint && layer instanceof L.CircleMarker) {
+        layer.setStyle({
+          color: "#ffffff",
+          weight: 3,
+          fillColor: "#9bd2ef",
+          fillOpacity: 0.95
+        });
+        layer.setRadius(8);
+      } else if (isPoint && layer instanceof L.Marker) {
+        layer.setIcon(L.divIcon({
+          className: "box09-marker",
+          iconSize: [18, 18],
+          iconAnchor: [9, 9],
+          popupAnchor: [0, -10]
+        }));
+      }
+
+      if (typeof layer.eachLayer === "function") {
+        layer.eachLayer(stylePhotoLayer);
+      }
+    }
+
+    map.eachLayer(stylePhotoLayer);
+
+    map.on("layeradd", function (event) {
+      stylePhotoLayer(event.layer);
+    });
+
+    window.requestAnimationFrame(function () {
+      map.invalidateSize({ pan: false });
+    });
+
+    window.addEventListener("resize", function () {
+      map.invalidateSize({ pan: false });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupBox09);
+  } else {
+    setupBox09();
+  }
+})();
+</script>
     </body>
 </html>
